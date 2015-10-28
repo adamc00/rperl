@@ -5,8 +5,10 @@ RUN cpanm -v RPerl
 
 RUN mkdir /usr/src/rperl
 
-# COPY . /usr/src/rperl
+COPY script/ /usr/src/rperl
 
-WORKDIR /usr/src/rperl
+WORKDIR /usr/local/lib/perl5/site_perl/5.20.3
 
-CMD ["rperl"]
+CMD ["/bin/bash"]
+
+RUN apt-get update && apt-get install -y vim
