@@ -1,14 +1,7 @@
-FROM perl:5.20.3
-MAINTAINER Adam Clarke <adam@clarke.id.au>
+FROM perl:5.20
 
-RUN cpanm -v RPerl
+COPY . /usr/src/rperl
+WORKDIR /usr/src/rperl
+RUN cpanm .
 
-RUN mkdir /usr/src/rperl
-
-COPY script/ /usr/src/rperl
-
-WORKDIR /usr/local/lib/perl5/site_perl/5.20.3
-
-CMD ["/bin/bash"]
-
-RUN apt-get update && apt-get install -y vim
+CMD [ "bash" ]
