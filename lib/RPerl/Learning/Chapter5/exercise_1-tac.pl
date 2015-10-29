@@ -7,17 +7,18 @@
 use RPerl;
 use strict;
 use warnings;
-our $VERSION = 0.002_000;
+our $VERSION = 0.003_000;
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls) # USER DEFAULT 1: allow numeric values & print operator
+## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
 
 # [[[ SUBROUTINES ]]]
 
 our void $tac = sub {
-    ( my string_arrayref $ARGV ) = @_;
-    $ARGV = [ reverse @{$ARGV} ];
-    foreach my string $file_name ( @{$ARGV} ) {
+    ( my string_arrayref $command_line_arguments ) = @_;
+    $command_line_arguments = [ reverse @{$command_line_arguments} ];
+    foreach my string $file_name ( @{$command_line_arguments} ) {
         if ( not( -e $file_name ) ) {
             croak 'ERROR: File ' . $file_name . ' does not exist, croaking';
         }
@@ -38,7 +39,7 @@ our void $tac = sub {
 
         my string_arrayref $file_lines = [];
 
-        foreach my string $file_line (<$FILE>) {
+        while ( my string $file_line = <$FILE> ) {
             push @{$file_lines}, $file_line;
         }
 
@@ -56,4 +57,4 @@ our void $tac = sub {
 
 # [[[ OPERATIONS ]]]
 
-tac( \@ARGV );
+tac( [@ARGV] );
