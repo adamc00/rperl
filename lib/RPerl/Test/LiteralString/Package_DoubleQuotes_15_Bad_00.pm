@@ -1,6 +1,5 @@
 # [[[ PREPROCESSOR ]]]
-# <<< PARSE_ERROR: 'ERROR ECVPAPC02' >>>
-# <<< PARSE_ERROR: 'Perl::Critic::Policy::Variables::ProhibitPunctuationVars' >>>
+# <<< PARSE_ERROR: 'ERROR ECVPARP00' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -11,7 +10,7 @@ our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]
 our string $empty_sub = sub {
-    return "`~!@#$%^&*()-_=+[]{}\|;:',<.>/?\n";
+    return "`~!#%^&*()-_=+[]{}\|;:',<.>/?\n";
 };
 
 1;    # end of package

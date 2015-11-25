@@ -3,7 +3,7 @@ package RPerl::Operation::Expression::Operator::Named;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.001_060;
+our $VERSION = 0.001_200;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::Operation::Expression::Operator);
@@ -19,24 +19,16 @@ our hashref $properties = {};
 # [[[ OO PROPERTIES, CLASS PROPERTY AKA PACKAGE VARIABLE ]]]
 # DEV NOTE, CORRELATION #rp20: upon adding new named op file lib/RPerl/Operation/Expression/Operator/Named/* also add in Grammar.eyp, Named.pm, and rperloperations.pm
 our string_hashref $NAMES = {
-    'cos'     => 'RPerl::Operation::Expression::Operator::Named::Cosine',
     'chomp'   => 'RPerl::Operation::Expression::Operator::Named::Chomp',
-    'defined' => 'RPerl::Operation::Expression::Operator::Named::Defined',
-    'exists'  => 'RPerl::Operation::Expression::Operator::Named::Exists',
-    '-e'      => 'RPerl::Operation::Expression::Operator::Named::FileExists',
-    '-r'      => 'RPerl::Operation::Expression::Operator::Named::FileReadable',
-    '-f'      => 'RPerl::Operation::Expression::Operator::Named::FileRegular',
-    '-T'      => 'RPerl::Operation::Expression::Operator::Named::FileText',
     'join'    => 'RPerl::Operation::Expression::Operator::Named::Join',
     'keys'    => 'RPerl::Operation::Expression::Operator::Named::Keys',
-    'length'  => 'RPerl::Operation::Expression::Operator::Named::Length',
     'pop'     => 'RPerl::Operation::Expression::Operator::Named::Pop',
     'push'    => 'RPerl::Operation::Expression::Operator::Named::Push',
     'reverse' => 'RPerl::Operation::Expression::Operator::Named::Reverse',
-    'sin'     => 'RPerl::Operation::Expression::Operator::Named::Sine',
     'sort'    => 'RPerl::Operation::Expression::Operator::Named::Sort',
     'split'   => 'RPerl::Operation::Expression::Operator::Named::Split',
-    'values'  => 'RPerl::Operation::Expression::Operator::Named::Values'
+    'values'  => 'RPerl::Operation::Expression::Operator::Named::Values',
+    'wait'  => 'RPerl::Operation::Expression::Operator::Named::Wait'
 };
 
 # [[[ OO METHODS & SUBROUTINES ]]]
@@ -50,21 +42,27 @@ our string_hashref::method $ast_to_rperl__generate = sub {
 
     my string $self_class = ref $self;
     my string $operator_name;
-    if (( $self_class eq 'Operator_81' )    # Operator -> OP01_NAMED SubExpression
-        or ( $self_class eq 'OperatorVoid_119' )
+    if ( $self_class eq 'Operation_79' ) {    # Statement -> OP01_NAMED_SCOLON
+        $operator_name = substr $self->{children}->[0], 0, -1;
+    }
+    elsif (( $self_class eq 'Operator_83' )    # Operator -> OP01_NAMED SubExpression
+        or ( $self_class eq 'OperatorVoid_121' )
         )                                   # OperatorVoid -> OP01_NAMED ListElement OP21_LIST_COMMA ListElements ';'
     {
         $operator_name = $self->{children}->[0];
     }
-    elsif ( $self_class eq 'Operator_82' ) {    # Operator -> LPAREN OP01_NAMED ListElement OP21_LIST_COMMA ListElements ')'
+    elsif ( $self_class eq 'Operator_84' ) {    # Operator -> LPAREN OP01_NAMED ListElement OP21_LIST_COMMA ListElements ')'
         $operator_name = $self->{children}->[1];
     }
     else {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECVGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: grammar rule '
                 . $self_class
-                . ' found where Operator_81, Operator_82, or OperatorVoid_119 expected, dying' )
+                . ' found where Operation_79, Operator_83, Operator_84, or OperatorVoid_121 expected, dying' )
             . "\n";
     }
+ 
+    # remove trailing whitespace, caused by the need to have the grammar match some tokens with a trailing whitespace, as with 'scalar ', etc.
+    $operator_name =~ s/^(\w+)\s*$/$1/gxms;
 
  # DEV NOTE: compile-time operator name checking short-circuited first by Parse Phase 0 ERROR ECVPAPL02 'Bareword "FOO" not allowed while "strict subs" in use';
  # can't figure out how to create test which gets past ECVPAPL02 to trigger ECVGEASRP12

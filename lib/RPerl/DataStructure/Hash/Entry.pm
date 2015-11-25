@@ -3,7 +3,7 @@ package RPerl::DataStructure::Hash::Entry;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.002_200;
+our $VERSION = 0.002_600;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::GrammarRule);
@@ -26,34 +26,41 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     #    RPerl::diag( 'in Hash::Entry->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
     my string $self_class = ref $self;
-    if ( $self_class eq 'HashEntry_201' ) {    # HashEntry -> VariableOrLiteralOrWord OP20_HASH_FATARROW OPTIONAL-47 SubExpression
+    if ( $self_class eq 'HashEntry_203' ) {    # HashEntry -> VarOrLitOrOpStrOrWord OP20_HASH_FATARROW OPTIONAL-48 SubExpression
         my string $key                 = $self->{children}->[0];
         my string $key_class           = ref $key;
         my string $fat_arrow           = $self->{children}->[1];
         my object $type_inner_optional = $self->{children}->[2];
         my string $key_name            = undef;
 
-        if (   ( $key_class eq 'VariableOrLiteralOrWord_226' )
-            or ( $key_class eq 'VariableOrLiteralOrWord_227' ) )
+        if (   ( $key_class eq 'VarOrLitOrOpStrOrWord_228' )
+            or ( $key_class eq 'VarOrLitOrOpStrOrWord_229' ) )
         {                                      # Variable or Literal
             $rperl_source_subgroup = $key->ast_to_rperl__generate($modes);
             RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
         }
-        elsif ( $key_class eq 'VariableOrLiteralOrWord_228' ) {    # WORD
-            $key_name = $key->{children}->[0];
-            $rperl_source_group->{PMC} .= $key->{children}->[0] . q{ };
+        elsif ( $key_class eq 'VarOrLitOrOpStrOrWord_230' ) {    # OpStringOrWord
+            $key_name = $key->{children}->[0]->{children}->[0];
+            $key_name =~ s/^(\w+)\s*$/$1/gxms;  # remove trailing whitespace, caused by grammar matching operator names with trailing spaces
+            if ($key_name !~ /^[a-z]/) {
+                die 'ERROR ECVGEASRP22, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: invalid hash key ' . q{'}
+                    . $key_name . q{'}
+                    . ' does not start with a lowercase letter a-z, dying' . "\n";
+            }
+            $rperl_source_group->{PMC} .= $key_name . q{ };
         }
         else {
             die RPerl::Parser::rperl_rule__replace( q{ERROR ECVGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: grammar rule '}
                     . ($key_class)
-                    . q{' found where VariableOrLiteralOrWord_226, VariableOrLiteralOrWord_227, or VariableOrLiteralOrWord_228 expected, dying} )
+                    . q{' found where VarOrLitOrOpStrOrWord_228, VarOrLitOrOpStrOrWord_229, or VarOrLitOrOpStrOrWord_230 expected, dying} )
                 . "\n";
         }
 
         if ( ( exists $type_inner_optional->{children}->[0] ) and ( defined $key_name ) ) {
-            my string $type_inner_name = $type_inner_optional->{children}->[0]->{children}->[3];
+            my string $type_inner_name = $type_inner_optional->{children}->[0]->{children}->[3]->{children}->[0];
+            $type_inner_name =~ s/^(\w+)\s*$/$1/gxms;  # remove trailing whitespace, caused by grammar matching operator names with trailing spaces
             if ( $type_inner_name !~ /$key_name$/xms ) {
-                die 'ERROR ECVGEASRP17, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: redundant name mismatch, inner type name ' . q{'}
+                die 'ERROR ECVGEASRP21, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: redundant name mismatch, inner type name ' . q{'}
                     . $type_inner_name . q{'}
                     . ' does not end with OO properties or hash key ' . q{'}
                     . $key_name . q{'}
@@ -73,14 +80,14 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         $rperl_source_subgroup = $subexpression->ast_to_rperl__generate($modes);
         RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
     }
-    elsif ( $self_class eq 'HashEntry_203' ) {    # HashEntry -> ENV
+    elsif ( $self_class eq 'HashEntry_205' ) {    # HashEntry -> ENV
         my string $env = $self->{children}->[0];
         $rperl_source_group->{PMC} .= $env . "\n";
     }
     else {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECVGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: grammar rule '
                 . $self_class
-                . ' found where HashEntry_201 or HashEntry_203 expected, dying' )
+                . ' found where HashEntry_203 or HashEntry_205 expected, dying' )
             . "\n";
     }
 
@@ -103,7 +110,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
     #    RPerl::diag( 'in Hash::Entry->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
     my string $self_class = ref $self;
-    if ( $self_class eq 'HashEntry_201' ) {    # HashEntry -> VariableOrLiteralOrWord OP20_HASH_FATARROW OPTIONAL-47 SubExpression
+    if ( $self_class eq 'HashEntry_203' ) {    # HashEntry -> VarOrLitOrOpStrOrWord OP20_HASH_FATARROW OPTIONAL-48 SubExpression
 
         my string $key                 = $self->{children}->[0];
         my string $key_class           = ref $key;
@@ -112,27 +119,34 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
         $cpp_source_group->{CPP} .= '{';
 
-        if (   ( $key_class eq 'VariableOrLiteralOrWord_226' )
-            or ( $key_class eq 'VariableOrLiteralOrWord_227' ) )
+        if (   ( $key_class eq 'VarOrLitOrOpStrOrWord_228' )
+            or ( $key_class eq 'VarOrLitOrOpStrOrWord_229' ) )
         {                                      # Variable or Literal
             $cpp_source_subgroup = $key->ast_to_cpp__generate__CPPOPS_CPPTYPES($modes);
             RPerl::Generator::source_group_append( $cpp_source_group, $cpp_source_subgroup );
         }
-        elsif ( $key_class eq 'VariableOrLiteralOrWord_228' ) {    # WORD
-            $key_name = $key->{children}->[0];
+        elsif ( $key_class eq 'VarOrLitOrOpStrOrWord_230' ) {    # OpStringOrWord
+            $key_name = $key->{children}->[0]->{children}->[0];
+            $key_name =~ s/^(\w+)\s*$/$1/gxms;  # remove trailing whitespace, caused by grammar matching operator names with trailing spaces
+            if ($key_name !~ /^[a-z]/) {
+                die 'ERROR ECVGEASCP22, CODE GENERATOR, ABSTRACT SYNTAX TO C++: invalid hash key ' . q{'}
+                    . $key_name . q{'}
+                    . ' does not start with a lowercase letter a-z, dying' . "\n";
+            }
             $cpp_source_group->{CPP} .= q{"} . $key_name . q{" };
         }
         else {
             die RPerl::Parser::rperl_rule__replace( q{ERROR ECVGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: grammar rule '}
                     . ($key_class)
-                    . q{' found where VariableOrLiteralOrWord_226, VariableOrLiteralOrWord_227, or VariableOrLiteralOrWord_228 expected, dying} )
+                    . q{' found where VarOrLitOrOpStrOrWord_228, VarOrLitOrOpStrOrWord_229, or VarOrLitOrOpStrOrWord_230 expected, dying} )
                 . "\n";
         }
 
         if ( ( exists $type_inner_optional->{children}->[0] ) and ( defined $key_name ) ) {
-            my string $type_inner_name = $type_inner_optional->{children}->[0]->{children}->[3];
+            my string $type_inner_name = $type_inner_optional->{children}->[0]->{children}->[3]->{children}->[0];
+            $type_inner_name =~ s/^(\w+)\s*$/$1/gxms;  # remove trailing whitespace, caused by grammar matching operator names with trailing spaces
             if ( $type_inner_name !~ /$key_name$/xms ) {
-                die 'ERROR ECVGEASCP17, CODE GENERATOR, ABSTRACT SYNTAX TO C++: redundant name mismatch, inner type name ' . q{'}
+                die 'ERROR ECVGEASCP21, CODE GENERATOR, ABSTRACT SYNTAX TO C++: redundant name mismatch, inner type name ' . q{'}
                     . $type_inner_name . q{'}
                     . ' does not end with OO properties or hash key ' . q{'}
                     . $key_name . q{'}
@@ -149,14 +163,14 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
         $cpp_source_group->{CPP} .= '}';
     }
-    elsif ( $self_class eq 'HashEntry_203' ) {    # HashEntry -> ENV
+    elsif ( $self_class eq 'HashEntry_205' ) {    # HashEntry -> ENV
         my string $env = $self->{children}->[0];
         $cpp_source_group->{CPP} .= q{// <<< RP::DS::H::E __DUMMY_SOURCE_CODE CPPOPS_CPPTYPES >>>} . "\n";
     }
     else {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECVGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: grammar rule '
                 . $self_class
-                . ' found where HashEntry_201 or HashEntry_203 expected, dying' )
+                . ' found where HashEntry_203 or HashEntry_205 expected, dying' )
             . "\n";
     }
 

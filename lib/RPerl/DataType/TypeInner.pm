@@ -3,7 +3,7 @@ package RPerl::DataType::TypeInner;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.002_000;
+our $VERSION = 0.002_200;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::GrammarRule);
@@ -25,11 +25,20 @@ our string_hashref::method $ast_to_rperl__generate = sub {
 #    RPerl::diag( 'in TypeInner->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
     my string $self_class = ref $self;
-    if ( $self_class eq 'TypeInner_220' ) {  # TypeInner -> MY Type '$TYPED_' WORD OP19_VARIABLE_ASSIGN
+    if ( $self_class eq 'TypeInner_222' ) {  # TypeInner -> MY Type '$TYPED_' OpStringOrWord OP19_VARIABLE_ASSIGN
         my string $my = $self->{children}->[0];
         my string $type = $self->{children}->[1]->{children}->[0];
         my string $TYPED = $self->{children}->[2];
-        my string $name  = $self->{children}->[3];
+        my string $name  = $self->{children}->[3]->{children}->[0];
+
+#        RPerl::diag( 'in TypeInner->ast_to_rperl__generate(), have $name = ' . "\n" . RPerl::Parser::rperl_ast__dump($name) . "\n" );
+        
+        $name =~ s/^(\w+)\s*$/$1/gxms;  # remove trailing whitespace, caused by grammar matching operator names with trailing spaces
+        if ($name !~ /^[a-z]/) {
+            die 'ERROR ECVGEASRP24, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: invalid redundant name ' . q{'}
+                . $name . q{'}
+                . ' does not start with a lowercase letter a-z, dying' . "\n";
+        }
         my string $equal = $self->{children}->[4];
 
         $rperl_source_group->{PMC} .= $my . q{ } . $type . q{ } . $TYPED . $name . q{ } . $equal . q{ };
@@ -38,7 +47,7 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         die RPerl::Parser::rperl_rule__replace(
             'ERROR ECVGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: grammar rule '
                 . $self_class
-                . ' found where TypeInner_220 expected, dying'
+                . ' found where TypeInner_222 expected, dying'
         ) . "\n";
     }
 
@@ -62,8 +71,15 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 #    RPerl::diag( 'in TypeInner->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
     my string $self_class = ref $self;
-    if ( $self_class eq 'TypeInner_220' ) {  # TypeInner -> MY Type '$TYPED_' WORD OP19_VARIABLE_ASSIGN
+    if ( $self_class eq 'TypeInner_222' ) {  # TypeInner -> MY Type '$TYPED_' WORD OP19_VARIABLE_ASSIGN
         my string $type = $self->{children}->[1]->{children}->[0];
+        my string $name  = $self->{children}->[3]->{children}->[0];
+        $name =~ s/^(\w+)\s*$/$1/gxms;  # remove trailing whitespace, caused by grammar matching operator names with trailing spaces
+        if ($name !~ /^[a-z]/) {
+            die 'ERROR ECVGEASCP24, CODE GENERATOR, ABSTRACT SYNTAX TO C++: invalid redundant name ' . q{'}
+                . $name . q{'}
+                . ' does not start with a lowercase letter a-z, dying' . "\n";
+        }
 
         $cpp_source_group->{CPP} = $type;
     }
@@ -71,7 +87,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
         die RPerl::Parser::rperl_rule__replace(
             'ERROR ECVGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: grammar rule '
                 . $self_class
-                . ' found where TypeInner_220 expected, dying'
+                . ' found where TypeInner_222 expected, dying'
         ) . "\n";
     }
 

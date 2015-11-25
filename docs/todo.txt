@@ -1,34 +1,81 @@
-DONE split n-body SSE from normal code, create linking in scripts
-DONE ensure perfect match for compiled Algorithm.*, Sort.*, Bubble.*, Inefficient.* files with hand-compiled *.CPPOPS_CPPTYPES versions
-DONE support for special chars in qw()
-Learning RPerl, all exercises parse
-	chpt3 ex3, RequireCheckedSyscalls failure
+DONE Copyright assignment & disclaimer docs (CONTRIBUTING, ASSIGNMENT, EMPLOYERS)
+DONE Disallow non-newline-or-tab (AKA extraneous) backslashes in double-quoted string literals
+TEMP DISABLE Macintosh, Failed test 'Inline::CPP, call Airplane methods...'    https://github.com/wbraswell/rperl/issues/34
+PARTIAL Windows Testing, add ci.appveyor.com github webhook
 
-sort out Operator::Expression::Operator::Named vs NamedUnary
+enable opstrings as hash keys
+
 10 more builtins, CPPOPS_CPPTYPES mode
-	Reverse
-Travis Windows, add ci.appveyor.com github webhook
+	NAMED
+	chomp
+	join
+	keys
+	pop
+	push
+	reverse
+	sort
+	split
+	values
+	wait
+
+	NAMED_UNARY
+	chdir
+	cos
+	defined
+	exists
+	-e
+	-r
+	-f
+	-T
+	length
+	rand
+	scalar
+	sin
+	sqrt (need create)
+
 Monolithic Modules, Fix Deps Warning
+figure out <> vs "" and also long-path-deps in includes in Bubble.cpp & Bubble.h
+
 tests
-	constructor type mismatch: array size declaration compensation; package/subroutine/method names starting w/ underscore; variable redeclaration (masking); 
-	properties & hash type-inner type-vs-key name mismatch (ECVGEASRP17: PERLOPS Class.pm properties accessors/mutators; CPPOPS entry & entrytyped);
-	accessors/mutators including get_*_element() & get_*_value(); subclasses Foo_raw type; $properties & VariableDeclaration array size on non-arrayref type;
-	$properties array size PERLOPS_PERLTYPES generation; variable & retrieval type mismatches, etc; get_raw() & set_raw()
+	array size declaration compensation
+	package/subroutine/method names starting w/ underscore
+	variable redeclaration (masking)
+	properties & hash type-inner type-vs-key name mismatch (ECVGEASRP20: PERLOPS Class.pm properties accessors/mutators; CPPOPS entry & entrytyped)
+	accessors/mutators including get_*_element() & get_*_value()
+	subclasses Foo_raw type
+	$properties & VariableDeclaration array size on non-arrayref type
+	$properties array size PERLOPS_PERLTYPES generation
+	variable & retrieval type mismatches, etc (including ECVGEASCP30?)
+	get_raw() & set_raw()
     t/13_compile_execute.t (?) for proper functionality
 	*_arrayref_arrayref_arrayref
 	while (my FOO)
-	DONE non-whitespace qw(foo*baz bar-hypenated bla+rgh)
 	<$FILEHANDLE>
 	@ARGV
 	%ENV
-figure out <> vs "" and also long-path-deps in includes in Bubble.cpp & Bubble.h
+	ERROR ECVGEASRP15... named operator [SOMEOP] requires exactly one argument, dying
+	ERROR ECVGEASRP16... named operator [SOMEOP] requires one or more arguments, dying
+	all currently-implemented named ops
+	all currently-implemented named_unary ops
+	invalid hash key starting with non-lowercase-letter ECVGEASRP22
+	invalid OO property name (hash key) starting with non-lowercase-letter ECVGEASRP23
+	invalid type inner redundant name starting with non-lowercase-letter ECVGEASRP24
+	CONSTANT_CALL_SCOPED
+	*_to_*() data type conversion functions
+	text literals, backslash vs double-backslash
 
-RELEASE v1.2 HALLOWEEN 
+Eyapp unescaped left braces for Perl v5.22 compatibility
+RELEASE Parse::Eyapp vX.YZZY
+
+RELEASE v1.21
+
 
 1 New Benchmark Application
 Finish All CPPOPS_CPPTYPES Code Generation
 
 RELEASE v1.3 THANKSGIVING
+
+
 
 Basic Loop Parallelization, CPPOPS_CPPTYPES Mode
 
@@ -60,9 +107,14 @@ RELEASE v3.0beta1 CHRISTMAS
 
 
 
+developer_notes.txt
+	warning & error codes
+		general code legend
+		specific codes
+	perlall
 
 Macintosh:
-	Failed test 'Inline::CPP, call Airplane methods, return correct value 1' at t/03_inline_cpp.t line 146.   '' doesn't match '/Object\ \(0x\w*\)/'
+	TEMP DISABLE Failed test 'Inline::CPP, call Airplane methods, return correct value 1' at t/03_inline_cpp.t line 146.   '' doesn't match '/Object\ \(0x\w*\)/'
 	unknown warning option '-Wno-literal-suffix'; did you mean '-Wno-literal-range'? [-Wunknown-warning-option]
 	duplicate 'extern' declaration specifier [-Wduplicate-decl-specifier] XS_EXTERNAL(boot_eval_412_3a53); /* prototype to pass -Wmissing-prototypes */
 		/System/Library/Perl/5.18/darwin-thread-multi-2level/CORE/XSUB.h:145:33: note: expanded from macro 'XS_EXTERNAL'
@@ -71,8 +123,9 @@ Macintosh:
 App, PhysicsPerl, Alioth Shootout N-Body Benchmark, Approved
 	OR New Benchmark Org
 
-Eyapp unescaped left braces for Perl v5.22 compatibility
-RELEASE Parse::Eyapp vX.YZZY
+data types & structures
+	determine if Float.pm should be kept or deleted
+	char type-testing subroutines in Character.pm
 
 RELEASE v1.XY
 
@@ -132,3 +185,11 @@ Shiny APTech site
 Shiny RPerl site
 Shiny App Store
 
+Perl::Critic Bugs
+	Eclipse EPIC Integration, Silent Failure    https://github.com/Perl-Critic/Perl-Critic/issues/582
+	ProhibitMagicNumbers False Positive    https://github.com/Perl-Critic/Perl-Critic/issues/631
+	Subroutines::RequireFinalReturn False Positive On Typed Loop Iterator    https://github.com/Perl-Critic/Perl-Critic/issues/636
+	ControlStructures::ProhibitPostfixControls False Positives on Typed Loop Iterator    https://github.com/Perl-Critic/Perl-Critic/issues/639
+	Argument "-" isn't numeric in exponentiation (**) at .../PPI/Token/Number/Exp.pm line 55    https://github.com/Perl-Critic/Perl-Critic/issues/665
+	InputOutput::RequireCheckedSyscalls False Positive On Typed Loop Iterator Without Final Newline    https://github.com/Perl-Critic/Perl-Critic/issues/671
+	
